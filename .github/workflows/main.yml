@@ -1,0 +1,75 @@
+name: Upload nlohmann-json to PyPI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+
+  get-versions:
+    name: "Upload latest nlohmann-json version to PyPI"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      TWINE_USERNAME: ${{ secrets.PYPI_USER }}
+      TWINE_PASSWORD: ${{ secrets.PYPI_PASS }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+        architecture: x64
+
+    - name: Install dependencies
+      run: pip install build
+
+    - name: Enable brew
+      run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
+
+    - name: Download nlohmann-json
+      run: brew install nlohmann-json
+
+    - name: Get latest version
+      id: version
+      run: echo "latest=$(brew list --version nlohmann-json | sed -e 's/nlohmann-json\s//')" >> $GITHUB_OUTPUT
+
+    - name: List version
+      run: echo "latest=${{ steps.version.outputs.latest }}"
+
+    - name: Get the nlohmann-json contents
+      run: cp -r /home/linuxbrew/.linuxbrew/Cellar/nlohmann-json/${{ steps.version.outputs.latest }}/include/* src/nlohmann_json/include
+
+    - name: Set PyPI Version
+      run: echo "${{ steps.version.outputs.latest }}" >> PYPI_VERSION
+
+    - name: Show contents
+      run: ls -ahl src/nlohmann_json/include
+
+    - name: Build wheel
+      run:  python -m build --wheel --outdir wheelhouse .
+    
+    - name: Test wheel
+      run: |
+        pip install wheelhouse/*
+        pip install pytest
+        pytest
+
+    - name: Keep Wheel file
+      uses: actions/upload-artifact@v3
+      with:
+        name: wheelhouse
+        path: ./wheelhouse/*.whl
+
+    - name: List assets
+      run: ls ./wheelhouse/ -al
+
+    - name: Upload wheels
+      if: github.event_name == 'workflow_dispatch'
+      run: |
+        pip install twine
+        echo "Publish to PyPI..."
+        twine upload --verbose wheelhouse/*
