@@ -6,9 +6,9 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "msgpack-cxx"
+name = "nlohmann-json"
 authors = [{ name = "Alliander Dynamic Grid Calculation", email = "dynamic.grid.calculation@alliander.com" }]
-description = "Repackaging of msgpack-cxx distributed via PyPI"
+description = "Repackaging of nlohmann-json distributed via PyPI"
 readme = "README.md"
 license = { text = "MIT" }
 classifiers = [
