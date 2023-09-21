@@ -1,0 +1,50 @@
+[build-system]
+requires = [
+    "setuptools",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nlohmann-json"
+authors = [{ name = "Alliander Dynamic Grid Calculation", email = "dynamic.grid.calculation@alliander.com" }]
+description = "Repackaging of nlohmann-json distributed via PyPI"
+readme = "README.md"
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: C++",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Topic :: File Formats",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+    "importlib-resources"
+]
+dynamic = [
+    "version"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest"
+]
+
+[project.urls]
+Home-page = "http://github.com/nlohmann/json"
+GitHub = "http://github.com/nlohmann/json"
+Documentation = "http://nlohmann.github.io/json/"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = true
+
+[tool.setuptools.dynamic]
+version = {file = "PYPI_VERSION"}
+
+[tool.setuptools.package-data]
+nlohmann_json = ["include/**/*"]
